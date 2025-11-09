@@ -1,19 +1,51 @@
 #pragma once
 
-#include <string>
+#include <bits/stdc++.h>
 
 class BigInt {
-private:
+
 	std::string digits;
 
 public:
 
-	BigInt(std::string s);
+	BigInt (std::string &);
+	BigInt (const char * s);
+	BigInt (unsigned long int n = 0);
+	BigInt (BigInt & obj);
+	//BigInt();
 
-	//friend functions
-	friend int bgLength(const BigInt & num);
+	friend int Length(const BigInt &);
 
-	//operators
-	friend BigInt operator += (BigInt& numA, const BigInt& numB);
+	friend void Print(const BigInt &);
+	friend bool Null(const BigInt &);
+	friend void divide_by_2(BigInt &);
+
+
+	BigInt &operator = (const BigInt &);
+
+	friend bool operator == (const BigInt &, const BigInt &);
+	friend bool operator < (const BigInt &, const BigInt &);
+	friend bool operator > (const BigInt &, const BigInt &);
+
+	friend BigInt &operator += (BigInt & num1, const BigInt & num2);
+	friend BigInt operator + (const BigInt &, const BigInt &);
+
+	friend BigInt &operator -= (BigInt & num1, const BigInt & num2);
+
+	friend BigInt &operator *= (BigInt & num1, const BigInt & num2);
+	friend BigInt operator * (const BigInt &, const BigInt &);
+
+	friend BigInt &operator /= (BigInt &, const BigInt &);
+	friend BigInt &operator %= (BigInt & num1, const BigInt & num2);
+
+	friend BigInt &operator ^= (BigInt & num1, const BigInt & num2);
+	friend BigInt operator ^ (BigInt & num1, const BigInt & num2);
+
+	int operator[] (const int index)const;
+
+	friend std::ostream &operator << (std::ostream &, const BigInt &);
+	friend std::istream &operator >> (std::istream &, BigInt &);
 
 };
+
+

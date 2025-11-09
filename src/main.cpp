@@ -31,10 +31,16 @@ bool trialComposite(int round_tester, int evenComponent, int miller_rabin_candid
 
 int main() {
 
+	BigInt num1("100");
+	BigInt num2("2");
+	//std::cout << num1 << std::endl;
 
-	BigInt num1("313");
-	BigInt num2("3");
-	num1 += num2;
+	BigInt num3("0");
+	num3 = 2^num2;
+
+	std::cout << num3;
+
+	//num2 == num1 ? std::cout << "True\n" : std::cout << "False\n";
 
 	return 0;
 
@@ -45,6 +51,18 @@ int main() {
 //between 2**(n-1)+1 and 2**n-1
 
 long int generateRandom(unsigned int bits) {
+
+	/*
+	srand(time(NULL));
+
+	BigInt max("0");
+	BigInt min("0");
+
+	BigInt two("2");
+	BigInt bigBits(bits);
+
+	max = two^
+*/
 
 	srand(time(NULL));
 
