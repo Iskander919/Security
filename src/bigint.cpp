@@ -131,6 +131,18 @@ bool operator > (const BigInt & num1, const BigInt & num2) {
 
 }
 
+bool operator <= (const BigInt & num1, const BigInt & num2) {
+
+	return !(num1 > num2);
+
+}
+
+bool operator >= (const BigInt & num1, const BigInt & num2) {
+
+	return !(num1 > num2);
+
+}
+
 BigInt &operator +=(BigInt & num1, const BigInt & num2) {
 
 	int t = 0, s, i;
@@ -200,6 +212,14 @@ BigInt &operator -= (BigInt & num1, const BigInt & num2) {
 
 	return num1;
 
+}
+
+BigInt operator - (const BigInt & num1, const BigInt & num2) {
+
+	BigInt temp;
+	temp = num1;
+	temp -= num2;
+	return temp;
 }
 
 
@@ -309,6 +329,16 @@ BigInt &operator /= (BigInt & num1, const BigInt & num2) {
 
 }
 
+BigInt operator / (const BigInt &num1, const BigInt &num2) {
+
+	BigInt temp;
+
+	temp = num1;
+	temp /= num2;
+
+	return temp;
+}
+
 BigInt &operator %= (BigInt &num1, const BigInt &num2) {
 
     if(Null(num2)) throw("Arithmetic Error: Division By 0");
@@ -355,6 +385,15 @@ BigInt &operator %= (BigInt &num1, const BigInt &num2) {
 
 }
 
+BigInt operator % (const BigInt & num1, const BigInt &num2) {
+
+	BigInt temp;
+
+	temp = num1;
+	temp %= num2;
+
+	return temp;
+}
 
 BigInt &operator ^= (BigInt & num1, const BigInt &num2) {
 
@@ -378,9 +417,11 @@ BigInt &operator ^= (BigInt & num1, const BigInt &num2) {
 
 }
 
-BigInt operator ^ (BigInt & num1, const BigInt & num2) {
+BigInt operator ^ (const BigInt &num1, const BigInt &num2) {
 
-	BigInt temp(num1);
+	BigInt temp;
+
+	temp = num1;
 	temp ^= num2;
 
 	return temp;

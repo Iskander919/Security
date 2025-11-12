@@ -26,20 +26,25 @@ public:
 	friend bool operator == (const BigInt &, const BigInt &);
 	friend bool operator < (const BigInt &, const BigInt &);
 	friend bool operator > (const BigInt &, const BigInt &);
+	friend bool operator <= (const BigInt &, const BigInt &);
+	friend bool operator >= (const BigInt &, const BigInt &);
 
 	friend BigInt &operator += (BigInt & num1, const BigInt & num2);
 	friend BigInt operator + (const BigInt &, const BigInt &);
 
 	friend BigInt &operator -= (BigInt & num1, const BigInt & num2);
+	friend BigInt operator - (const BigInt & num1, const BigInt & num2);
 
 	friend BigInt &operator *= (BigInt & num1, const BigInt & num2);
 	friend BigInt operator * (const BigInt &, const BigInt &);
 
 	friend BigInt &operator /= (BigInt &, const BigInt &);
+	friend BigInt operator / (const BigInt &num1, const BigInt &num2);
 	friend BigInt &operator %= (BigInt & num1, const BigInt & num2);
+	friend BigInt operator % (const BigInt & num1, const BigInt & num2);
 
 	friend BigInt &operator ^= (BigInt & num1, const BigInt & num2);
-	friend BigInt operator ^ (BigInt & num1, const BigInt & num2);
+	friend BigInt operator ^ (const BigInt &num1, const BigInt &num2);
 
 	int operator[] (const int index)const;
 

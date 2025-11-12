@@ -4,6 +4,7 @@
  *  Created on: 25 окт. 2025 г.
  *      Author: iskan
  */
+
 #include <algorithm>
 #include <cmath>
 #include <ctime>
@@ -16,31 +17,36 @@
 
 std::vector<int> fPrimeNums;
 
-long generateRandom(unsigned int bits);
-long getPrimeCandidate(unsigned int bits);
+BigInt generateRandom(int bits);
+BigInt getPrimeCandidate(int bits);
+BigInt modPow(BigInt base, BigInt exponent, BigInt mod);
 void generatePrimes(int n);
-bool millerRabinPassed();
+bool millerRabinPassed(BigInt candidate, int rounds);
 
 //service functions for rabinMillerTest:
 //-----------------------------------------------------//
 
-int expmod(int base, int exp, int mod);
-bool trialComposite(int round_tester, int evenComponent, int miller_rabin_candidate, int maxDivisionsByTwo);
+BigInt expmod(BigInt base, BigInt exponent, BigInt mod);
+bool trialComposite(BigInt round_tester, BigInt evenComponent, BigInt miller_rabin_candidate, BigInt maxDivisionsByTwo);
 
 //-----------------------------------------------------//
 
 int main() {
 
-	BigInt num1("100");
-	BigInt num2("2");
-	//std::cout << num1 << std::endl;
+	std::string numb("0");
 
-	BigInt num3("0");
-	num3 = 2^num2;
+	while(1) {
 
-	std::cout << num3;
+		std::cin >> numb;
+		//std::cout << "\n";
+		BigInt num(numb);
+		millerRabinPassed(num, 10) ? std::cout << "True" : std::cout << "False";
+		std::cout << "\n";
 
-	//num2 == num1 ? std::cout << "True\n" : std::cout << "False\n";
+	}
+
+	BigInt num("9");
+	millerRabinPassed(num, 10) ? std::cout << "True" : std::cout << "False";
 
 	return 0;
 
@@ -50,26 +56,17 @@ int main() {
 //the function for generating n-bit random number (n = bits)
 //between 2**(n-1)+1 and 2**n-1
 
-long int generateRandom(unsigned int bits) {
+BigInt generateRandom(int bits) {
 
-	/*
 	srand(time(NULL));
 
 	BigInt max("0");
 	BigInt min("0");
 
-	BigInt two("2");
-	BigInt bigBits(bits);
+	max = (BigInt("2")^BigInt(bits)) - BigInt("1");
+	min = (BigInt("2")^(BigInt(bits) - BigInt(1))) + BigInt("1");
 
-	max = two^
-*/
-
-	srand(time(NULL));
-
-	long max = (long)powl(2, bits) - 1;		//calculate upper bound
-	long min = (long)powl(2, bits-1) + 1;	//calculate lower bound
-
-	return min + (rand() % (max - min + 1));
+	return min + (BigInt(rand()) % (max - min + BigInt("1")));
 
 }
 
@@ -78,20 +75,27 @@ long int generateRandom(unsigned int bits) {
 //divisible by few hundred first primes using
 //Sieve of Eratosthenes. Returns a candidate to be a prime
 
-long int getPrimeCandidate(unsigned int bits) {
+BigInt getPrimeCandidate(int bits) {
 
 	while(1) {
 
-		long int primeCandidate = generateRandom(bits);
-
+		BigInt primeCandidate = generateRandom(bits);
+		bool isDivisible = false;
 
 		for (int divisor : fPrimeNums) {
 
-			if ((primeCandidate % divisor == 0) && (divisor*divisor <= primeCandidate)) break;
+			if(primeCandidate % BigInt(divisor) == BigInt("0")) {
 
-			else return primeCandidate;
+				isDivisible = true;
+				break;
+
+			}
+
+			if(BigInt(divisor) * BigInt(divisor) > primeCandidate) break;
 
 		}
+
+		if (!isDivisible) return primeCandidate;
 
 	}
 
@@ -137,39 +141,120 @@ void generatePrimes(int n) {
 	fPrimeNums.erase(std::remove(fPrimeNums.begin(), fPrimeNums.end(), 0), fPrimeNums.end());
 
 
-/*
+	/*
 	for(int p = 0; p <= fPrimeNums.size(); p++) {
 
 		std::cout << fPrimeNums[p] << std::endl;
 	}
-*/
+	*/
 }
 
 //the function that implements Rabin-Miller test.
 //returns true if the primeCandidate probably prime and false if it isn't prime.
 //The more rounds value, the more precise the result
-bool millerRabinPassed(int miller_rabin_candidate, int rounds) {
+bool millerRabinPassed(BigInt candidate, int rounds) {
 
-  int maxDivisionsByTwo = 0;
-  int evenComponent = miller_rabin_candidate-1;
+	if (candidate < BigInt("2") || candidate % BigInt("2") == BigInt("0")) return false;
+	if (candidate == BigInt("3")) return true;
 
-  while (evenComponent % 2 == 0)
+	BigInt candidateOne("0");
+	candidateOne = candidate - BigInt("1");
+	BigInt divisionTwoRounds("0");
+	BigInt multiplier("0");
+
+	while(candidateOne % BigInt("2") == BigInt("0")) { //represent in the form of (2**divisionTwoRounds) * multiplier
+
+		candidateOne /= BigInt("2");
+		divisionTwoRounds += 1;
+
+	}
+
+	multiplier = (candidate - BigInt("1")) / (BigInt("2") ^ divisionTwoRounds);
+
+	for (int i = 0; i < rounds; i++) {
+
+		BigInt randomNum;
+		BigInt x;
+		bool flag = false;
+
+		//generating a random number between 2 and candidate - 2:
+		randomNum = BigInt("2") + BigInt(rand()) % (candidate - BigInt("2")  -  BigInt("2")  +  BigInt("1"));
+
+		//calculating x = randomNum ^ multiplier % candidate
+		x = modPow(randomNum, multiplier, candidate);
+
+		if (x == BigInt("1") || x == candidate - BigInt("1")) {
+
+			continue;
+
+		}
+
+		for (int j = 0; j < divisionTwoRounds - 1; j++) {
+
+			x = modPow(x, BigInt("2"), candidate);
+			if (x == BigInt("1")) continue;
+
+			if (x == candidate - BigInt("1")) {
+
+				flag = true;
+				break;
+
+			}
+
+		}
+
+		if (flag == true) continue;
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+BigInt modPow(BigInt base, BigInt exponent, BigInt mod) {
+
+	base %= mod;
+	BigInt result("1");
+
+	while (exponent > BigInt("0")) {
+
+	    if ((exponent % 2) != BigInt("0")) result = (result * base) % mod;
+	    base = (base * base) % mod;
+
+	    exponent /= 2;
+
+	}
+
+	return result;
+}
+
+//the function that implements Rabin-Miller test.
+//returns true if the primeCandidate probably prime and false if it isn't prime.
+//The more rounds value, the more precise the result
+/*
+bool millerRabinPassed(BigInt miller_rabin_candidate, int rounds) {
+
+  BigInt maxDivisionsByTwo = BigInt("0");
+  BigInt evenComponent = miller_rabin_candidate - BigInt("1");
+
+  while ((evenComponent % BigInt("2")) == BigInt("0"))
   {
 
-    evenComponent >>= 1;
-    maxDivisionsByTwo += 1;
+	  evenComponent /= BigInt(2);
+	  maxDivisionsByTwo += BigInt(1);
 
   }
 
   // Set number of trials here
 
-  for (int i = 0; i < (rounds) ; i++)
+  for (int i = 0; i < rounds; i++)
   {
 
-    int round_tester = rand() * (miller_rabin_candidate - 2) + 2;
+	  BigInt round_tester = BigInt(rand()) * (miller_rabin_candidate - BigInt("2")) + BigInt("2");
 
-    if (trialComposite(round_tester, evenComponent, miller_rabin_candidate, maxDivisionsByTwo))
-      return false;
+	  if (trialComposite(round_tester, evenComponent, miller_rabin_candidate, maxDivisionsByTwo)) return false;
 
   }
 
@@ -180,35 +265,37 @@ bool millerRabinPassed(int miller_rabin_candidate, int rounds) {
 //-----------------------------------------------------//
 //service functions for Rabin-Miller test
 
-int expmod(int base, int exp, int mod) {
+BigInt expmod(BigInt base, BigInt exp, BigInt mod) {
 
-	if (exp == 0) return 1;
+	if (exp == BigInt("0")) return BigInt("1");
 
-	if (exp % 2 == 0) {
+	if (exp % BigInt("2") == BigInt("0")) {
 
-		return (int)pow(expmod(base, (exp/2), mod), 2) % mod;
+		return expmod(base, (exp/BigInt("2")), mod) ^ BigInt(2) % mod;
 
 	}
 
-	else { return (base * expmod(base, (exp-1), mod)) % mod; }
+	else { return (base * BigInt(expmod(base, (exp - BigInt("1")), mod))) % mod; }
 
 }
 
-bool trialComposite(int round_tester, int evenComponent, int miller_rabin_candidate, int maxDivisionsByTwo) {
+
+bool trialComposite(BigInt round_tester, BigInt evenComponent, BigInt miller_rabin_candidate, BigInt maxDivisionsByTwo) {
 
   if (expmod(round_tester, evenComponent, miller_rabin_candidate) == 1 ) return false;
 
   for (int i = 0; i < maxDivisionsByTwo; i++)
   {
 
-    if (expmod(round_tester, (1 << i) * evenComponent, miller_rabin_candidate) == miller_rabin_candidate - 1)
-      return false;
+    if (expmod(round_tester, BigInt((1 << i)) * evenComponent, miller_rabin_candidate) == miller_rabin_candidate - BigInt(1))
+
+    	return false;
 
   }
 
   return true;
+*/
 
-}
 
 
 
