@@ -17,27 +17,56 @@
 
 std::vector<int> fPrimeNums;
 
+// generating prime numbers functions:
 BigInt generateRandom(int bits);
 BigInt getPrimeCandidate(int bits);
 BigInt modPow(BigInt base, BigInt exponent, BigInt mod);
 void   generatePrimes(int n);
 bool   millerRabinPassed(BigInt candidate, int rounds);
 
+// RSA implementing functions:
+BigInt pqMultiplication(BigInt p, BigInt q);
+BigInt EulerFunction(BigInt p, BigInt q);
+BigInt EuclidAlgorithm(BigInt a, BigInt b);
+
 int main() {
 
-	generatePrimes(10000);
+	generatePrimes(10000); // generating several thousand first primes
 	int bits = 16, rounds = 20;
-	BigInt num;
+	BigInt num1; // p
+	BigInt num2; // q
+	BigInt pq;   // p*q
+	BigInt phi;  // (p-1)(q-1)
+	BigInt d;    // result of Euclid algorhitm (finding greatest common divisor)
 
+/*	// generating p and q:
 	do {
 
-		num = getPrimeCandidate(bits);
+		num1 = getPrimeCandidate(bits);
 
 	}
 
-	while (!millerRabinPassed(num, rounds));
+	while (!millerRabinPassed(num1, rounds));
 
-	std::cout << num;
+	while (1) {
+
+		num2 = getPrimeCandidate(bits);
+		if(num2 == num1) continue;
+
+		if (millerRabinPassed(num2, rounds)) break;
+
+	}
+
+	std::cout << "p = " << num1 << std::endl;
+	std::cout << "q = " << num2 << std::endl;
+
+	pq = pqMultiplication(num1, num2);
+
+	std::cout << "pq = " << pq << std::endl;
+*/
+	std::cout << "GCD = " << EuclidAlgorithm(BigInt("20"), BigInt("10"));
+
+
 
 	return 0;
 
@@ -221,6 +250,29 @@ BigInt modPow(BigInt base, BigInt exponent, BigInt mod) {
 	return result;
 }
 
+BigInt pqMultiplication(BigInt p, BigInt q) {
+
+	return p * q;
+
+}
+
+BigInt EulerFunction(BigInt p, BigInt q) {
+
+	return (p - BigInt("1")) * (q - BigInt("1"));
+
+}
+
+BigInt EuclidAlgorithm(BigInt a, BigInt b) {
+
+	if (a % b == BigInt("0")) return b;
+
+	if (b % a == BigInt("0")) return a;
+
+	if (a > b) return EuclidAlgorithm (a % b, b);
+
+	return EuclidAlgorithm (a, b % a);
+
+}
 
 
 
