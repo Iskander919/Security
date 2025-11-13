@@ -27,9 +27,10 @@ bool   millerRabinPassed(BigInt candidate, int rounds);
 // RSA implementing functions:
 BigInt pqMultiplication(BigInt p, BigInt q);
 BigInt EulerFunction(BigInt p, BigInt q);
-BigInt EuclidAlgorithm(BigInt a, BigInt b);
+BigInt extended_gcd(BigInt a, BigInt b, BigInt& x, BigInt& y);
 
 int main() {
+
 
 	generatePrimes(10000); // generating several thousand first primes
 	int bits = 16, rounds = 20;
@@ -39,7 +40,12 @@ int main() {
 	BigInt phi;  // (p-1)(q-1)
 	BigInt d;    // result of Euclid algorhitm (finding greatest common divisor)
 
-/*	// generating p and q:
+	BigInt x("1");
+	BigInt y("1");
+
+	BigInt e("16879"); // value of public exponent
+
+	// generating p and q:
 	do {
 
 		num1 = getPrimeCandidate(bits);
@@ -60,13 +66,16 @@ int main() {
 	std::cout << "p = " << num1 << std::endl;
 	std::cout << "q = " << num2 << std::endl;
 
-	pq = pqMultiplication(num1, num2);
+	pq  = pqMultiplication(num1, num2);
+	phi = EulerFunction(num1, num2);
 
-	std::cout << "pq = " << pq << std::endl;
-*/
-	std::cout << "GCD = " << EuclidAlgorithm(BigInt("20"), BigInt("10"));
+	std::cout << "pq = "  << pq << std::endl;
+	std::cout << "phi = " << phi << std::endl;
 
+	std::cout << "GCD = " << extended_gcd(BigInt("20"), BigInt("6"), x, y) << std::endl;
 
+	std::cout << "x = "   << x << std::endl;
+	std::cout << "y = "   << y << std::endl;
 
 	return 0;
 
@@ -262,18 +271,40 @@ BigInt EulerFunction(BigInt p, BigInt q) {
 
 }
 
-BigInt EuclidAlgorithm(BigInt a, BigInt b) {
 
-	if (a % b == BigInt("0")) return b;
+BigInt extended_gcd(BigInt a, BigInt b, BigInt& x, BigInt& y)
+{
+    if (b == BigInt("0")) {
+        x = BigInt("1");
+        y = BigInt("0");
+        return a;
+    }
 
-	if (b % a == BigInt("0")) return a;
+    BigInt x1("1"), y1("1");
+    BigInt g("1");
 
-	if (a > b) return EuclidAlgorithm (a % b, b);
+    g = extended_gcd(b, a % b, x1, y1);
 
-	return EuclidAlgorithm (a, b % a);
+    x = y1;
+
+    BigInt temp;
+    temp = (a / b) * y1;
+
+    if (temp > x1) {
+
+    	y = (a / b) * y1 - x1;
+
+    }
+
+    else {
+
+    	y = x1 - (a / b) * y1;
+
+    }
+
+    return g;
 
 }
-
 
 
 
