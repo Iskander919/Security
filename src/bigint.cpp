@@ -184,16 +184,31 @@ BigInt operator + (const BigInt & num1, const BigInt & num2) {
 
 BigInt &operator -= (BigInt & num1, const BigInt & num2) {
 
-	if(num1 < num2) throw("UNDERFLOW");
+	//bool negativeFactor = false;
+	BigInt temp2;
+	temp2 = num2;
 
-	int n = Length(num1), m = Length(num2);
+	if (num1 < num2) throw("Underflow");
+
+/*
+	if (num1 < num2) {
+
+		negativeFactor = true;
+
+		temp2 = num1;
+		num1 = num2;
+
+	}
+*/
+
+	int n = Length(num1), m = Length(temp2);
 	int i, t = 0, s;
 
 	for (i = 0; i < n; i++) {
 
-		if(i < m) s = num1.digits[i] - num2.digits[i] + t;
+		if(i < m) s = num1.digits[i] - temp2.digits[i] + t;
 
-	    else s = num1.digits[i]+ t;
+		else s = num1.digits[i]+ t;
 
 	    if(s < 0) s += 10, t = -1;
 
@@ -210,6 +225,8 @@ BigInt &operator -= (BigInt & num1, const BigInt & num2) {
 
 	}
 
+	//if (negativeFactor == true) num1.digits.push_back(45 - '0');
+
 	return num1;
 
 }
@@ -220,6 +237,7 @@ BigInt operator - (const BigInt & num1, const BigInt & num2) {
 	temp = num1;
 	temp -= num2;
 	return temp;
+
 }
 
 
@@ -464,6 +482,72 @@ std::istream &operator >> (std::istream & in, BigInt & num) {
 	}
 
 	return in;
+
+}
+
+signedBigInt mul(const signedBigInt &num1, const BigInt &num2) {
+
+	signedBigInt result;
+
+	result.sign = num1.sign;
+	result.value = num1.value * num2;
+
+	return result;
+
+}
+
+signedBigInt add(const signedBigInt &num1, const signedBigInt &num2) {
+
+	signedBigInt result;
+
+	result.value = BigInt("0");
+	result.sign  = 1;
+
+	if (num1.sign == num2.sign) {
+
+		result.value = num1.value + num2.value;
+		result.sign  = num1.sign;
+
+	}
+
+	else {
+
+		if (num1.value > num2.value) {
+
+			result.value = num1.value - num2.value;
+			result.sign  = num1.sign;
+
+		}
+
+		else if (num1.value == num2.value) {
+
+			result.value = BigInt("0");
+			result.sign = 1;
+
+		}
+
+		else {
+
+			result.value = num2.value - num1.value;
+			result.sign  = num2.sign;
+
+		}
+	}
+
+	return result;
+
+}
+
+signedBigInt sub (const signedBigInt &num1, const signedBigInt &num2) {
+
+	signedBigInt result;
+	signedBigInt temp2;
+	temp2 = num2;
+	temp2.sign *= (-1);
+
+	result = add(num1, temp2);
+
+	return result;
 
 }
 

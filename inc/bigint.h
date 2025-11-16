@@ -53,4 +53,17 @@ public:
 
 };
 
+//structure for operating with signed BigInts
+//(needed for extended Euclidius algorhitm)
+struct signedBigInt {
+
+	BigInt value;
+	int sign;
+
+};
+
+signedBigInt mul(const signedBigInt &num1, const BigInt &num2); //multiply function
+signedBigInt add(const signedBigInt &num1, const signedBigInt &num2); //add function
+signedBigInt sub(const signedBigInt &num1, const signedBigInt &num2); //substitute function
+
 

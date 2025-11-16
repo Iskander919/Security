@@ -27,23 +27,50 @@ bool   millerRabinPassed(BigInt candidate, int rounds);
 // RSA implementing functions:
 BigInt pqMultiplication(BigInt p, BigInt q);
 BigInt EulerFunction(BigInt p, BigInt q);
-BigInt extended_gcd(BigInt a, BigInt b, BigInt& x, BigInt& y);
+BigInt extendedGCD(BigInt a, BigInt b, signedBigInt& x, signedBigInt& y);
 
 int main() {
 
 
 	generatePrimes(10000); // generating several thousand first primes
-	int bits = 16, rounds = 20;
-	BigInt num1; // p
-	BigInt num2; // q
+	int bits = 4, rounds = 20;
+	BigInt num1(19); // p
+	BigInt num2(41); // q
 	BigInt pq;   // p*q
 	BigInt phi;  // (p-1)(q-1)
-	BigInt d;    // result of Euclid algorhitm (finding greatest common divisor)
+	BigInt d;
+	BigInt gcd;  // result of Euclid algorhitm (finding greatest common divisor)
+	BigInt e("7");
 
-	BigInt x("1");
-	BigInt y("1");
+	signedBigInt x;
+	signedBigInt y;
 
-	BigInt e("16879"); // value of public exponent
+	/*
+	signedBigInt r;
+
+	gcd = extendedGCD(BigInt("691"), BigInt("720"), x, y);
+
+	if (x.sign == -1) {
+
+		d = BigInt("720") - (x.value % BigInt("720"));
+
+	}
+
+	else {
+
+		d = x.value % BigInt("720");
+
+	}
+
+	std::cout << "gcd= " << gcd << std::endl;
+	std::cout << "x= "   << x.value << std::endl;
+	std::cout << "y= " 	 << y.value << std::endl;
+
+*/
+
+
+
+
 
 	// generating p and q:
 	do {
@@ -68,14 +95,49 @@ int main() {
 
 	pq  = pqMultiplication(num1, num2);
 	phi = EulerFunction(num1, num2);
+	gcd = extendedGCD(e, phi, x, y);
 
 	std::cout << "pq = "  << pq << std::endl;
 	std::cout << "phi = " << phi << std::endl;
 
-	std::cout << "GCD = " << extended_gcd(BigInt("20"), BigInt("6"), x, y) << std::endl;
+	std::cout << "GCD = " << gcd << std::endl;
 
-	std::cout << "x = "   << x << std::endl;
-	std::cout << "y = "   << y << std::endl;
+	std::cout << "x = "   << x.value << std::endl;
+	std::cout << "y = "   << y.value << std::endl;
+
+	if (x.sign == -1) {
+
+		d = phi - (x.value % phi);
+
+	}
+
+	else {
+
+		d = x.value % phi;
+
+	}
+
+	std::cout << "d = " << d << std::endl;
+	std::cout << "e = " << e << std::endl;
+
+	std::cout << "----------------------------------" << std::endl;
+
+	std::cout << "Public key:  (" << pq << ", " << e << ")" << std::endl;
+	std::cout << "Private key: (" << pq << ", " << d << ")" << std::endl;
+
+	int message = 0;
+	std::cout << "Enter message: \n";
+	std::cin >> message;
+
+	BigInt encrypt("0");
+	BigInt decrypt("0");
+	BigInt msg = BigInt(message);
+
+	encrypt = (msg ^ e) % pq;
+	decrypt = (encrypt ^ d) % pq;
+
+	std::cout << "Encrypt: " << encrypt << std::endl;
+	std::cout << "Decrypt: " << decrypt << std::endl;
 
 	return 0;
 
@@ -272,37 +334,42 @@ BigInt EulerFunction(BigInt p, BigInt q) {
 }
 
 
-BigInt extended_gcd(BigInt a, BigInt b, BigInt& x, BigInt& y)
+BigInt extendedGCD(BigInt a, BigInt b, signedBigInt &x, signedBigInt &y)
 {
     if (b == BigInt("0")) {
-        x = BigInt("1");
-        y = BigInt("0");
+        x.value = BigInt("1");
+        x.sign  = 1;
+
+        y.value = BigInt("0");
+        y.sign  = 1;
+
         return a;
     }
 
-    BigInt x1("1"), y1("1");
-    BigInt g("1");
+    signedBigInt x1, y1;
+    BigInt g;
 
-    g = extended_gcd(b, a % b, x1, y1);
+    g = extendedGCD(b, a % b, x1, y1);
 
     x = y1;
 
-    BigInt temp;
-    temp = (a / b) * y1;
-
-    if (temp > x1) {
-
-    	y = (a / b) * y1 - x1;
-
-    }
-
-    else {
-
-    	y = x1 - (a / b) * y1;
-
-    }
+    signedBigInt temp = mul(y1, a / b);
+    y = sub(x1, temp);
 
     return g;
+
+}
+
+BigInt GCD(BigInt num1, BigInt num2) {
+
+	if (num1 % num2 == BigInt("0")) return num2;
+
+	if (num2 % num1 == BigInt("0")) return num1;
+
+	if (num1 > num2) return GCD(num1 % num2, num2);
+
+	return GCD(num1, num2 % num1);
+
 
 }
 
