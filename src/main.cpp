@@ -29,48 +29,25 @@ BigInt pqMultiplication(BigInt p, BigInt q);
 BigInt EulerFunction(BigInt p, BigInt q);
 BigInt extendedGCD(BigInt a, BigInt b, signedBigInt& x, signedBigInt& y);
 
+
+//encrypt/decrypt functions:
+void encryptString(std::string msg, BigInt exp, BigInt mod, std::vector<BigInt> &cipher);
+
 int main() {
 
 
 	generatePrimes(10000); // generating several thousand first primes
-	int bits = 4, rounds = 20;
+	int bits = 32, rounds = 20;
 	BigInt num1(19); // p
 	BigInt num2(41); // q
 	BigInt pq;   // p*q
 	BigInt phi;  // (p-1)(q-1)
 	BigInt d;
 	BigInt gcd;  // result of Euclid algorhitm (finding greatest common divisor)
-	BigInt e("7");
+	BigInt e("65537");
 
 	signedBigInt x;
 	signedBigInt y;
-
-	/*
-	signedBigInt r;
-
-	gcd = extendedGCD(BigInt("691"), BigInt("720"), x, y);
-
-	if (x.sign == -1) {
-
-		d = BigInt("720") - (x.value % BigInt("720"));
-
-	}
-
-	else {
-
-		d = x.value % BigInt("720");
-
-	}
-
-	std::cout << "gcd= " << gcd << std::endl;
-	std::cout << "x= "   << x.value << std::endl;
-	std::cout << "y= " 	 << y.value << std::endl;
-
-*/
-
-
-
-
 
 	// generating p and q:
 	do {
@@ -133,8 +110,8 @@ int main() {
 	BigInt decrypt("0");
 	BigInt msg = BigInt(message);
 
-	encrypt = (msg ^ e) % pq;
-	decrypt = (encrypt ^ d) % pq;
+	encrypt = modPow(msg, e, pq);
+	decrypt = modPow(encrypt, d, pq);
 
 	std::cout << "Encrypt: " << encrypt << std::endl;
 	std::cout << "Decrypt: " << decrypt << std::endl;
@@ -360,21 +337,19 @@ BigInt extendedGCD(BigInt a, BigInt b, signedBigInt &x, signedBigInt &y)
 
 }
 
-BigInt GCD(BigInt num1, BigInt num2) {
+void encryptString(std::string msg, BigInt exp, BigInt mod, std::vector<BigInt> &cipher) {
 
-	if (num1 % num2 == BigInt("0")) return num2;
+	//std::vector<BigInt> cipher;
 
-	if (num2 % num1 == BigInt("0")) return num1;
+	for(int i = 0; i < (int)msg.length(); i++) {
 
-	if (num1 > num2) return GCD(num1 % num2, num2);
+		int code = (int)msg[i];
 
-	return GCD(num1, num2 % num1);
+		cipher[i] = modPow(BigInt(code), exp, mod);
 
+	}
 
 }
-
-
-
 
 
 
